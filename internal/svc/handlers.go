@@ -3,8 +3,8 @@ package svc
 import (
 	"net/http"
 
-	"github.com/cloud-mill/cloudmill-websocket/internal/logger"
-	"github.com/cloud-mill/cloudmill-websocket/internal/models"
+	"github.com/cloud-mill/webrtc-signalling/internal/logger"
+	"github.com/cloud-mill/webrtc-signalling/internal/models"
 	"github.com/olahol/melody"
 	"go.uber.org/zap"
 )

@@ -3,7 +3,7 @@ package models
 import (
 	"sync"
 
-	"github.com/cloud-mill/cloudmill-websocket/internal/logger"
+	"github.com/cloud-mill/webrtc-signalling/internal/logger"
 	"go.uber.org/zap"
 )
 

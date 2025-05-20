@@ -1,3 +1,3 @@
-## cloudmill-websocket
+## webrtc-signalling
 
-### **The ultimate template for your scalable websocket service**
+### WebRTC signalling sever implemented in Golang

@@ -1,4 +1,4 @@
-module github.com/cloud-mill/cloudmill-websocket
+module github.com/cloud-mill/webrtc-signalling
 
 go 1.22.0
 

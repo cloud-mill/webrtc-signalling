@@ -3,7 +3,7 @@ package models
 import (
 	"encoding/json"
 
-	"github.com/cloud-mill/cloudmill-websocket/internal/logger"
+	"github.com/cloud-mill/webrtc-signalling/internal/logger"
 	"github.com/olahol/melody"
 	"go.uber.org/zap"
 )

@@ -4,7 +4,7 @@ import (
 	"flag"
 	"strings"
 
-	"github.com/cloud-mill/cloudmill-websocket/internal/logger"
+	"github.com/cloud-mill/webrtc-signalling/internal/logger"
 	"github.com/google/uuid"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
