@@ -11,7 +11,7 @@ type ClientPool struct {
 	Register   chan *Client
 	Unregister chan *Client
 	Clients    map[string]*Client
-	rwMutex    sync.RWMutex
+	mu         sync.RWMutex
 }
 
 func NewClientPool() *ClientPool {
@@ -22,65 +22,71 @@ func NewClientPool() *ClientPool {
 	}
 }
 
-func (cp *ClientPool) Start() error {
+func (cp *ClientPool) Start() {
 	for {
 		select {
 		case client := <-cp.Register:
-			logger.Logger.Info("registering client", zap.String("client_id", client.Id))
-			cp.SetClient(client.Id, client)
+			cp.handleRegister(client)
 
 		case client := <-cp.Unregister:
-			logger.Logger.Info("unregistering client", zap.String("client_id", client.Id))
-			cp.DeleteClient(client.Id)
+			cp.handleUnregister(client)
 		}
 	}
 }
 
-func (cp *ClientPool) GetClient(clientId string) *Client {
-	cp.rwMutex.RLock()
-	defer cp.rwMutex.RUnlock()
-
-	return cp.Clients[clientId]
-}
-
-func (cp *ClientPool) SetClient(clientId string, client *Client) {
-	cp.rwMutex.Lock()
-	defer cp.rwMutex.Unlock()
-
-	cp.Clients[clientId] = client
-}
-
-func (cp *ClientPool) DeleteClient(clientId string) {
-	cp.rwMutex.Lock()
-	defer cp.rwMutex.Unlock()
-
-	delete(cp.Clients, clientId)
-}
-
-func (cp *ClientPool) SendMessageToClient(clientId string, message Message) {
-	client := cp.GetClient(clientId)
-	if client != nil {
-		processedMessage := ProcessedMessage{
-			Id:        message.Id,
-			Type:      message.Type,
-			Timestamp: message.Timestamp,
-			Payload:   message.Payload,
-		}
-		client.Write(processedMessage)
+func (cp *ClientPool) handleRegister(client *Client) {
+	if client == nil {
+		return
 	}
+	logger.Logger.Info("registering client", zap.String("client_id", client.Id))
+	cp.SetClient(client.Id, client)
 }
 
-func (cp *ClientPool) ClientExitFromPool(clientId string) {
-	client := cp.GetClient(clientId)
-	if client != nil {
-		cp.Unregister <- client
+func (cp *ClientPool) handleUnregister(client *Client) {
+	if client == nil {
+		return
+	}
+	logger.Logger.Info("unregistering client", zap.String("client_id", client.Id))
+	cp.DeleteClient(client.Id)
 
+	if client.Session != nil {
 		if err := client.Session.Close(); err != nil {
-			logger.Logger.Error(
-				"failed to close client session",
+			logger.Logger.Error("failed to close client session",
 				zap.String("client_id", client.Id),
 				zap.Error(err),
 			)
 		}
+	}
+}
+
+func (cp *ClientPool) GetClient(clientID string) *Client {
+	cp.mu.RLock()
+	defer cp.mu.RUnlock()
+	return cp.Clients[clientID]
+}
+
+func (cp *ClientPool) SetClient(clientID string, client *Client) {
+	cp.mu.Lock()
+	defer cp.mu.Unlock()
+	cp.Clients[clientID] = client
+}
+
+func (cp *ClientPool) DeleteClient(clientID string) {
+	cp.mu.Lock()
+	defer cp.mu.Unlock()
+	delete(cp.Clients, clientID)
+}
+
+func (cp *ClientPool) SendMessageToClient(clientID string, message Message) {
+	client := cp.GetClient(clientID)
+	if client != nil {
+		client.Write(message)
+	}
+}
+
+func (cp *ClientPool) ClientExitFromPool(clientID string) {
+	client := cp.GetClient(clientID)
+	if client != nil {
+		cp.Unregister <- client
 	}
 }
