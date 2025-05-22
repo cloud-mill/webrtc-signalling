@@ -62,7 +62,7 @@ func (c *Client) HandleMessage(raw []byte) error {
 
 	var msg Message
 	if err := json.Unmarshal(raw, &msg); err != nil {
-		logger.Logger.Error("invalId message format",
+		logger.Logger.Error("invalid message format",
 			zap.String("client_Id", c.Id),
 			zap.Error(err),
 		)
