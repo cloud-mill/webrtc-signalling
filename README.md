@@ -1,3 +1,3 @@
 ## webrtc-signalling
 
-### WebRTC signalling sever implemented in Golang
+### WebRTC signalling server implemented in Golang

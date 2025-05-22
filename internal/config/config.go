@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	Config     CloudmillWebsocketConfig
+	Config     ServerConfig
 	InstanceId string
 )
 
@@ -22,7 +22,7 @@ type AuthConfig struct {
 	CsrfHeaderName          string `json:"csrf_header_name"`
 }
 
-type CloudmillWebsocketConfig struct {
+type ServerConfig struct {
 	Host           string     `json:"host"`
 	Port           int        `json:"port"`
 	AllowedOrigins []string   `json:"allowed_origins"`
@@ -98,7 +98,7 @@ func init() {
 
 	validateConfig()
 
-	Config = CloudmillWebsocketConfig{
+	Config = ServerConfig{
 		Host:           viper.GetString(EnvHost),
 		Port:           viper.GetInt(EnvPort),
 		AllowedOrigins: getEnvAsStringSlice(EnvAllowedOrigins),
